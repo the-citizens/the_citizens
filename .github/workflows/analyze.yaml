@@ -1,0 +1,23 @@
+name: Dart Analysis
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "/bin/*.dart"
+      - "/lib/*.dart"
+      - "/web/*.dart"
+  workflow_call:
+defaults:
+  run:
+    working-directory: "./"
+jobs:
+  generate:
+    uses: "./pub_get.yaml"
+  analysis:
+    needs: generate
+    runs-on: ubuntu-latest
+    steps:
+    - name: anal
+      run: dart analyze
+      working-directory: "./"

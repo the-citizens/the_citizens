@@ -1,0 +1,13 @@
+name: Page Generate & Build
+
+on:
+  page_build
+defaults:
+  run:
+    working-directory: "./"
+jobs:
+  pre:
+    uses: "./analyze.yaml"
+  build:
+    needs: pre
+    steps:

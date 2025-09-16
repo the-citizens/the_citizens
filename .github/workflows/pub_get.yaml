@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - "/pubspec.yaml"
+  workflow_call:
 defaults:
   run:
     working-directory: "./"
@@ -36,16 +37,3 @@ jobs:
         git push
       working-directory: "./"
       if: steps.diff.outcome == 'failure'
-  analysis:
-    needs: generate
-    runs-on: ubuntu-latest
-    steps:
-    - uses: dart-lang/setup-dart@v1
-      with:
-        sdk: 3.7
-    - name: install dependencies
-      run: dart pub get
-      working-directory: "./"
-    - name: anal
-      run: dart analyze
-      working-directory: "./"
