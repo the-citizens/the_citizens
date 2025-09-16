@@ -22,5 +22,6 @@ executables:
   loctk:
 topics:
   - localmin
-  - website
+  - portal
+  - twitter
 publish_to: none
