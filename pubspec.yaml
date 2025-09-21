@@ -18,8 +18,8 @@ dependencies:
   color: ^3.0.0
   sitemap: ^1.0.0
 executables:
-  serve:
   loctk:
+  locktk:
 topics:
   - localmin
   - portal
