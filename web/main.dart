@@ -1,3 +1,3 @@
-void void main() {
+void main() {
   /* code */
 }
