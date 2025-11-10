@@ -120,7 +120,7 @@ class DesignQR {
         Option.color("background_option_color", RgbColor.name("white")),
       ];
   static List<Option> bgOptions(Uri bgImage)
-    = <Option>[
+    => <Option>[
        Option.nr("image_show_background": 0),
         Option.uri("image", bgImage),
         Option.nr("image_size": 0.2),
@@ -135,4 +135,3 @@ enum ImageKind {
   
   final String str;
 }
-
