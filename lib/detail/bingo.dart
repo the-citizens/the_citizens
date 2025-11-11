@@ -101,7 +101,17 @@ class BingoSquare<B extends Bingo> {
   }
 
   BingoResult<B> answer(List<BingoAnswer<B>> answers) {
-    return BingoResult<B>._(this, , this.center);
+    List<int> qNrs = this._questions.map<int>((BingoQuestion<B> qe) => qe.number).toList();
+    List<LocatedAnswer<B>> las = answers
+      .map<LocatedAnswer<B>>((BingoAnswer<B> ae) {
+        if (qNrs.exists(ae.number)) {
+          return LocatedAnswer<B>(this._arrangement(ae.number), ae);
+        } else {
+          throw NoSuchAsBingoNrError(ae.number);
+        }
+      }
+      .toList();
+    return BingoResult<B>._(this, las, this.center);
   }
 }
 
@@ -209,4 +219,10 @@ class ExternalOfBingoError {
   final int width;
   
   ExternalOfBingoError(this.pos, this.width);
+}
+
+class NoSuchAsBingoNrError {
+  final int number;
+
+  NoSuchAsBingoNrError(this.number);
 }
