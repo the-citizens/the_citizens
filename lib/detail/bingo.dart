@@ -38,6 +38,13 @@ enum CheckMark {
   final bool canBeMarked;
 }
 
+enum Axis {
+  x,y;
+  
+  List<Line> lines(int width)
+    => List<Line>.generate(width, (int pos) => Line(this, pos));
+}
+
 class BingoSquare<B extends Bingo> {
   final int width;
   final List<Point<int>> _arrangement;
@@ -118,13 +125,38 @@ class BingoResult<B extends Bingo> {
       .where((LocatedAnswer<B> ae) => ae.position == pos)
       .single.answer;
   }
-  //ToDo: ビンゴ判定
-  /*
-  bool isBingo(bool onRow, int pos)
-  List<>
-  int bingoCount
-  */
+
+  bool isBingo(Line line)
+    => line.points(this.base.width)
+      .map<bool>((Point<int> pos) {
+        if (this.base.isCenter(pos)) {
+          return true;
+        }
+        return this._answers
+          .where((LocatedAnswer<B> lae) => lae.position == pos)
+          .single.answer
+          .status.canBeMarked;
+      })
+      .reduce((bool prev, bool curr) => prev && curr);
+
+  List<Line> bingoLines({bool x = false, bool y = false}) {
+    if (!x && !y) {
+      return <Line>[];
+    }
+    if (x && y) {
+      return this.bingoLines(x: true)
+        .followedBy(this.bingoLines(y: true))
+        .toList();
+    }
+    return (x ? Axis.x : Axis.y, pos)
+      .lines(this.base.width)
+      .where((Line le) => this.isBingo(le))
+      .toList();
+  }
+  int bingoCount({bool x = false, bool y = false})
+    => this.bingoLines(x: x, y: y).length;
 }
+
 class BingoQuestion<B extends Bingo> {
   final int number;
   final String label;
@@ -145,6 +177,12 @@ class BingoAnswer<B extends Bingo> {
 }
 
 extension type LocatedAnswer<B extends Bingo>(Point<int> position, BingoAnswer<B> answer) {}
+
+extension type Line (Axis axis, int pos) {
+  List<Point<int>> points(int width)
+   => List<Point<int>>.generate(width,
+   (int con) => this.axis == Axis.x ? Point<int>(pos, con) : Point<int>(con, pos));
+}
 
 class IllegalBingoFmtError {
   final List<Object> target;
