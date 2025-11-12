@@ -1,6 +1,9 @@
 import "dart:math" show Point;
 import "package:the_citizens/common/collection.dart";
 
+typedef LocatedQuestion<B extends Bingo> = LocatedQAPart<B, BingoQuestion<B>>;
+typedef LocatedAnswer<B extends Bingo> = LocatedQAPart<B, BingoAnswer<B>>;
+
 abstract class Bingo {
   static int centerCo(int width)
     => width ~/ 2 + 1;
@@ -122,19 +125,36 @@ class BingoResult<B extends Bingo> {
 
   BingoResult._(this.base, this._answers, this.center);
 
+  List<LocatedQuestion<B>> get _questions
+    => this.base._questions
+      .map<LocatedQuestion<B>>((BingoQuestion<B> qe) => LocatedQAPart<B, BingoQuestion<B>>(this.base._arrangement[qe.number], qe))
+      .toList();
+  List<LocatedQuestion<B>> get questions
+    => <LocatedQuestion<B>>[...(this._questions)];
   List<LocatedAnswer<B>> get answers
-    => [...(this._answers)];
-  BingoAnswer<B> answer(Point<int> pos) {
+    => <LocatedAnswer<B>>[...(this._answers)];
+  P _qaPartOf<P extends BingoQAPart<B>>(List<P> qaPart, Point<int> pos) {
     if (this.base.isCenter(pos)) {
       throw CenterIsNotSelectableError<B>.bundle();
     }
     if (!this.base.isInternal(pos)) {
       throw ExternalOfBingoError<B>(pos, width);
     }
-    return this._answers
-      .where((LocatedAnswer<B> ae) => ae.position == pos)
-      .single.answer;
+    return qaPart
+      .where((LocatedQAPart<B, P> pe) => pe.position == pos)
+      .single.qa;
+    
   }
+  BingoQuestion<B> questionOf(Point<int> pos)
+    => this._qaPartOf<BingoQuestion<B>>(this._questions, pos);
+  BingoAnswer<B> answerOf(Point<int> pos)
+    => this._qaPartOf<BingoAnswer<B>>(this._answers, pos);
+  
+  ({String symbol, String label}) render(int x, int y)
+    => (
+        symbol: this.answerOf(Point<int>(x, y)).status.symbol,
+        label: this.questionOf(Point<int>(x, y)).label
+      );
 
   bool isBingo(Line line)
     => line.points(this.base.width)
@@ -144,7 +164,7 @@ class BingoResult<B extends Bingo> {
         }
         return this._answers
           .where((LocatedAnswer<B> lae) => lae.position == pos)
-          .single.answer
+          .single.qa
           .status.canBeMarked;
       })
       .reduce((bool prev, bool curr) => prev && curr);
@@ -166,27 +186,27 @@ class BingoResult<B extends Bingo> {
   int bingoCount({bool x = false, bool y = false})
     => this.bingoLines(x: x, y: y).length;
 }
-
-class BingoQuestion<B extends Bingo> {
+sealed class BingoQAPart<B extends Bingo> {
   final int number;
+}
+class BingoQuestion<B extends Bingo> extends BingoQAPart<B> {
   final String label;
   final String desc;
 
-  const BingoQuestion(this.number, this.label, [this.desc = ""])
+  const BingoQuestion(super.number, this.label, [this.desc = ""]);
   
   BingoAnswer<B> answer(CheckMark status, [String addition = ""])
   => BingoAnswer<B>(this.number, status, addition);
 }
 
-class BingoAnswer<B extends Bingo> {
-  final int number;
+class BingoAnswer<B extends Bingo> extends BingoQAPart<B> {
   final CheckMark status;
   final String addition;
 
-  const BingoAnswer(this.number, this.status, [this.addition = ""]);
+  const BingoAnswer(super.number, this.status, [this.addition = ""]);
 }
 
-extension type LocatedAnswer<B extends Bingo>(Point<int> position, BingoAnswer<B> answer) {}
+extension type LocatedQAPart<B extends Bingo, P extends BingoQAPart<B>>(Point<int> position, P qa) {}
 
 extension type Line (Axis axis, int pos) {
   List<Point<int>> points(int width)
