@@ -207,9 +207,19 @@ class BingoAnswer<B extends Bingo> extends BingoQAPart<B> {
   const BingoAnswer(super.number, this.status, [this.addition = ""]);
 }
 
-extension type LocatedQAPart<B extends Bingo, P extends BingoQAPart<B>>(Point<int> position, P qa) {}
+class LocatedQAPart<B extends Bingo, P extends BingoQAPart<B>> {
+  final Point<int> position;
+  final P qa;
 
-extension type Line (Axis axis, int pos) {
+  LocatedQAPart(this.position, this.qa);
+}
+
+class Line {
+  final Axis axis;
+  final int pos;
+
+  const Line(this.axis, this.pos);
+
   List<Point<int>> points(int width)
    => List<Point<int>>.generate(width,
    (int con) => this.axis == Axis.x ? Point<int>(pos, con) : Point<int>(con, pos));
