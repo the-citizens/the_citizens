@@ -61,3 +61,73 @@ extension List2Uint on Uint8List {
       _ => throw UnimplementedError(),
     };
 }
+
+class Doub {
+  final int high;
+  final int low;
+  
+  const Doub(this.high, this.low);
+  const Doub.from(int ui32):
+    this.high = 0,
+    this.low = ui32;
+  static Doub parse(String input){
+    late String base;
+    late String highS;
+    late String lowS;
+    //0xffffffff
+    final int hexWide = 8;
+    
+    bool isDec = decUInt.hasMatch(input);
+    bool isHex = hexUInt.hasMatch(input);
+    bool isHex2 = hexUInt2.hasMatch(input);
+    
+    if (isDec) {
+      BigInt big = BigInt.parse(input);
+      return Doub((big >> 32).toInt(), (big & BigInt.from(0xffffffff)).toInt());
+    } else if(isHex || isHex2){
+      if (isHex) {
+        base = input.substring(2);
+      } else {
+        RegExpMatch m = isHex2.firstMatch(input)!;
+        
+        if(!m.groupNames.contains("val")){
+          throw 0;
+        }
+        base = m.group("val")!.replaceAll(" ", "");
+      }
+      
+      if (base.length <= hexWide) {
+        highS = "0";
+        lowS = base;
+      } else {
+        highS = base.substring(0, base.length - hexWide);
+        lowS = base.substring(base.length - hexWide);
+      }
+      
+      return Doub(int.parse(highS, radix: 16), int.parse(lowS, radix: 16));
+    } else {
+      throw FormatException("input string is not decimal or hex integer format");
+    }
+  }
+  String toHexString([bool? useAltHead = false]){
+    String head = useAltHead == null ? "" : (useAltHead ? "xh" : "0x");
+    String highS = (this.high == 0 ? "" : this.high.toRadixString(16);
+    Strong lowSN = this.low.toRadixString(16);
+    String lowS = (this.high == 0 ? lowSN : lowSN.padLeft(8, "0"));
+  }
+  
+  @override
+  String toString() {
+    BigInt big = (BigInt.from(high) << 32) | BigInt.from(low);
+    return big.toString();
+  }
+  @override
+  bool operator ==(Object other)
+    => other is Doub && this.high == other.high && this.low == other.low;
+  @override
+  int hashCode => Object.hash(this.high, this.low);
+}
+
+final RegExp hexUInt = RegExp(r"^(xh|0x)[0-9a-fA-F]+$");
+final RegExp hexUInt2 = RegExp(r"^(xh|x16)\{(?<val>[0-9a-fA-F]{1,3}( ?[0-9a-fA-F]{4})*)\}$");
+final RegExp decUInt = RegExp(r"^([0-9]|([1-9][0-9]+))$");
