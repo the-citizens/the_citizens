@@ -31,7 +31,11 @@ class LeadSet<E>{
     => <E>[...(this._entries)];
   E get entry {
     if(this._primary == -1){
-      throw StateError("Single entry can not be returned because primary entry is not assigned.");
+      if (this._entries.length == 1) {
+        return this._entries.single;
+      } else {
+        throw StateError("Single entry can not be returned because primary entry is not assigned and base entries is not single.");
+      }
     }
   }
   E? get entryOr {
