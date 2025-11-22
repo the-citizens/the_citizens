@@ -60,6 +60,9 @@ extension List2Uint on Uint8List {
         => this.buffer.asByteData().getUint64(offset),
       _ => throw UnimplementedError(),
     };
+    
+  Doub toDouble()
+    => Doub.fromList(this);
 }
 
 class Doub {
@@ -70,6 +73,9 @@ class Doub {
   const Doub.from(int ui32):
     this.high = 0,
     this.low = ui32;
+  Doub.fromList(List<int> ui8arr, [int offset == 0]):
+    this.high = ui8arr.sublist(offset, offset + BinaryUnitWidth.word.bytes).toUint(BinaryUnitWidth.word),
+    this.low = ui8arr.sublist(offset + BinaryUnitWidth.word.bytes, offset + BinaryUnitWidth.word.bytes * 2).toUint(BinaryUnitWidth.word);
   static Doub parse(String input){
     late String base;
     late String highS;
@@ -109,13 +115,19 @@ class Doub {
       throw FormatException("input string is not decimal or hex integer format");
     }
   }
+  
   String toHexString([bool? useAltHead = false]){
     String head = useAltHead == null ? "" : (useAltHead ? "xh" : "0x");
     String highS = (this.high == 0 ? "" : this.high.toRadixString(16);
     Strong lowSN = this.low.toRadixString(16);
     String lowS = (this.high == 0 ? lowSN : lowSN.padLeft(8, "0"));
   }
-  
+  Uint8List toBinary([int offset = 0])
+    => Uint8List.fromList(
+      this.high.toWord(offset)
+        .followedBy(
+          this.low.toWord(offset))
+        .toList());
   @override
   String toString() {
     BigInt big = (BigInt.from(high) << 32) | BigInt.from(low);
