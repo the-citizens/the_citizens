@@ -64,4 +64,8 @@ class Twimg {
   static Uri base = Uri.https("pbs.twimg.com", "/");
   static Uri icon(String cls, String file) = Twimg.base.cd(<String>["profile_images", cls, file]);
   static Uri header(String high, String low, {int width = 1500, int height = 500}) = Twimg.base.cd(<String>["profile_banners", high, low, "${width}x$height"]);
+  static Uri media(String file, {bool original = true})
+    => Twimg.base
+      .cd(<String>["media", file])
+      .replace(queryParameters: original ? <String, String>{"name": "orig"} : null);
 }
