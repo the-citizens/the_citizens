@@ -238,3 +238,16 @@ class TaggedRoster<K extends Enum, E>{
     return re;
   }
 }
+
+class TiredList<T> {
+  final List<T> main;
+  final List<T> sub;
+  TiredList(this.main, [List<T>? sub]):
+    this.sub = sub ?? <T>[];
+  TiredList.empty():
+    this.main = <T>[],
+    this.sub = <T>[];
+  TiredList.from(Iterable<T> main, Iterable<T> sub):
+    this.main = main.toList(),
+    this.sub = sub.toList();
+}
