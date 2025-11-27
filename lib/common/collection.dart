@@ -99,6 +99,8 @@ class LeadSet<E>{
   }
 }
 
+typedef TaggedList<K extends Enum, E> = List<TaggedEntry<K, E>>;
+
 class TaggedEntry<K extends Enum, E>{
   final E entry;
   final K kind;
