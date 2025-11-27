@@ -4,7 +4,7 @@ class Assets {
   final SiteMeta _site;
   final Uri dir = this._site.rawUri(<String>["assets", ""]);
   
-  const Assets._(this._site);
+  Assets._(this._site);
   
   Uri file(String name, [String? group])
     => group == null ? this._site.rawUri(<String>["assets", name]) : this._site.rawUri(<String>["assets", group, name]);
