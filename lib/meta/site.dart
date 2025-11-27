@@ -15,9 +15,23 @@ class SiteMeta {
   final Color = Colors.core;
 
   // Domains & Urls
-  final Uri hostDomain = interim ? Uri.https("localdb.dev-pack.org", "/portal/") : Uri.parse("portal.example.org", "/");
+  Uri get portalDomain = this.hostDomain(this.portalSub);
+  String get mailDomain = this.hostDomainStr(this.mailSub);
+  String get siteDomain = this.hostDomainStr(this.siteSub);
+  
+  final String domainBase = "example.net";
+  
+  final String portalSub = "portal";
+  final String mailSub = "ms";
+  final String siteSub = "site";
+  
+  Uri hostDomain(String sub)
+    => interim ? Uri.https("localdb.dev-pack.org", "/$sub/") : Uri.https("$sub.${this.domainBase}", "/");
+  String hostDomainStr(String sub)
+    => this.hostDomain(sub).authority;
+
   Uri hostUrl(List<String> path)
-  => hostDomain.cd(path);
+  => this.portalDomain.cd(path);
 
   // https://raw.githubusercontent.com/the-citizens/the_citizens/refs/heads/
   final Uri rawDomain = Uri.https("raw.githubusercontent.com", "/the-citizens/the_citizens/refs/heads/");
